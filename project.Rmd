@@ -125,7 +125,7 @@ summary(whites_wine$volatile.acidity)
 # Multivariate Plots Section
 
 ```{r echo=FALSE, Multivariate_Plots}
-
+ggplot(aes(x=fixed_acidity))
 ```
 
 # Multivariate Analysis
