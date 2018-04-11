@@ -9,6 +9,7 @@ WineQualityWhites-EDA
 # This prevents the code from displaying in the knitted HTML output.
 # You should set echo=FALSE for all code chunks in your file.
 #install.packages('GGally')
+knitr::opts_chunk$set(echo = FALSE,message = FALSE,warning = FALSE)
 library(GGally)
 library(ggplot2)
 suppressMessages(library(dplyr))
@@ -16,8 +17,9 @@ suppressMessages(library(dplyr))
 
 ```{r echo=FALSE, Load_the_Data}
 # Load the Data
-setwd('C:\\Users\\Richard\\Desktop\\EDA-P3_0327')
+setwd('C:\\Users\\Richard\\Desktop\\EDA_20180328\\submit')
 whites_wine<-read.csv('wineQualityWhites.CSV')
+whites_wine<- whites_wine[,-1] #delete X index colume
 ```
 
 # Univariate Plots Section
@@ -32,52 +34,30 @@ summary(whites_wine)
   
     The dataset contains 11 chemical component observations of 4898 white wines.Acidity,sugar,alcohol,etc.The quality score of the wine is shown in 0-10.
   
-```{r echo=FALSE,alcoholhistogram}
+```{r echo=FALSE,alcohol}
 ggplot(aes(x=quality),data = whites_wine)+
-  geom_histogram( stat = 'count',binwidth = 1)
+  geom_bar()
 ```
   
   
   
     The quality score of the wine is close to the normal distribution, the average wine is in the majority (the score is 5-7), there are also a few poor quality wines, the quality is extremely rare.So the quality of the wine is related to what factors, the most important characteristics of the usual drinking, alcohol concentration, taste (sweet and sour).
-```{r echo=FALSE,alcohol }
+```{r echo=FALSE }
 ggplot(aes(x=alcohol),data = whites_wine)+
   geom_histogram()
 
 
 ggplot(aes(x=alcohol),data = whites_wine)+
   geom_histogram(binwidth = 0.05)+
-  scale_x_continuous(limits = c(8, 14.2),breaks = seq(8,14.2,0.5))
+  scale_x_continuous(limits = c(8, 14.2),breaks = seq(8,14.2,0.5))+
+  ggtitle('The histogram of alcohol')+
+  xlab('alcohol(% by volume)')
 summary(whites_wine$alcohol)
 ```
   
   
   
-    Adjust group width and X axis, most white wine's alcohol concentration is 9.5~11.
-```{r echo=FALSE}
-ggplot(aes(x = alcohol), data = whites_wine) + 
-  geom_freqpoly()+
-  scale_x_continuous(limits = c(8, 14.2),breaks = seq(8,14.2,0.5))+
-  xlab('alcohol(% by volume )')
-
-
-ggplot(aes(x=alcohol,y=..count..),data = whites_wine)+
-  geom_freqpoly(aes(color=quality))+
-  scale_x_continuous(limits = c(8, 14.2),breaks = seq(8,14.2,0.5))+
-  xlab('alcohol(% by volume )')
-
-
-ggplot(aes(x = alcohol, y = ..density..), data = whites_wine) + 
-  geom_freqpoly(aes(color = quality), binwidth=0.05) + 
-  scale_x_continuous(limits = c(8, 14.2), breaks = seq(8, 14.2, 0.5)) + 
-  xlab('alcohol(% by volume )')
-
-```
-  
-  
-  
-    It is found from the frequency polygon graph that the alcohol concentration in different quality wines is not the same, and the wine with low score is left partial.The wine with high score is more right.
-  
+    Adjust group width and X axis, most white wine's alcohol concentration is 9.5~11.The median is 10.40 and the mean is 10.51,they're very close.
 
 ```{r echo=FALSE,fixed.acidity}
 ggplot(aes(x=fixed.acidity),data = whites_wine)+
@@ -125,37 +105,45 @@ summary(whites_wine$citric.acid)
   
   
 ```{r echo=FALSE,total_acidity}
-whites_wine<-transform(whites_wine,total_acidity=fixed.acidity+volatile.acidity+citric.acid)
+whites_wine<-transform(whites_wine,total_acidity=fixed.acidity+volatile.acidity+citric.acid) #add the acid together as total_acidity
 summary(whites_wine$total_acidity)
 ggplot(aes(x=total_acidity),data = whites_wine)+
   geom_histogram(binwidth = 0.05)+
-  scale_x_continuous(breaks = seq(0,12,0.5),limits = c(4,12))
+  scale_x_continuous(breaks = seq(0,12,0.5),limits = c(4,12))+
+  ggtitle('The histofram of total acidity')+
+  xlab('total acidity(g/dm^3)')      
 
 ggplot(aes(x=total_acidity),data = whites_wine)+
   geom_histogram(binwidth = 0.05)+
-  scale_x_continuous(breaks = seq(0,12,0.5),limits = c(4,12))+
-  facet_wrap(~quality,scales = 'free_y',ncol = 2)
+  scale_x_continuous(breaks = seq(0,12,1),limits = c(4,12))+
+  facet_wrap(~quality,scales = 'free_y',ncol = 2)+
+  ggtitle('The histogram of total_acidity in each quality')+
+  xlab('total_acidity(g/dm^3)')  #plot histogram of total acidity in each quality
 ```
   
   
   
   
-    Add an total_acidity(fixed acidity+volatile acidity+citric acid) colume to dataset,most white wine total acidity value between 7-8g/dm^3,create the facet_grid,There is no indication that the wine of that quality has a   lower or higher acidity.
+    Add an total_acidity(fixed acidity+volatile acidity+citric acid) colume to dataset,most white wine total acidity value between 7-8g/dm^3,create the quality facet_grid,There is no indication that the wine of that quality has a   lower or higher acidity.
 
 ```{r echo=FALSE,residual.sugar}
 summary(whites_wine$residual.sugar)
 ggplot(aes(x=residual.sugar),data = whites_wine)+
-  geom_histogram(binwidth = 0.5)
+  geom_histogram(binwidth = 0.5) #The histogram of residual.sugar
 
 
 ggplot(aes(x=residual.sugar),data = whites_wine)+
   geom_histogram(binwidth = 0.5)+
-  scale_x_continuous(limits = c(0,21))
+  scale_x_continuous(limits = c(0,21))+
+  ggtitle('The histogram of residual.sugar')+
+  xlab('residual.sugar(g/dm^3)')#Adjust the x axis
 
 
 ggplot(aes(x=residual.sugar),data = whites_wine)+
   geom_histogram(binwidth = 0.02)+
-  scale_x_log10()
+  scale_x_log10()+
+  ggtitle('The histogram of log10(residual.sugar)')+
+  xlab('log10(residual.sugar)(g/dm^3)')  #x-log10(),transformed the long tail data to better understand the distribution of residual sugar
 dim(subset(whites_wine,residual.sugar>=20))
 ```
   
@@ -180,52 +168,68 @@ ggplot(aes(x=chlorides),data = whites_wine)+
 ```{r echo=FALSE,free.sulfur.dioxide}
 summary(whites_wine$free.sulfur.dioxide)
 ggplot(aes(x=free.sulfur.dioxide),data = whites_wine)+
-  geom_histogram()
+  geom_histogram()+
+  ggtitle('The histogram of sulfur.dioxide') #plot the histogram of free.sulfur.dioxide
 
 ggplot(aes(x=free.sulfur.dioxide),data = whites_wine)+
   geom_histogram(binwidth = 0.5)+
-  scale_x_continuous(breaks = seq(0,90,2),limits = c(0,90))
+  scale_x_continuous(breaks = seq(0,90,3),limits = c(0,90))+
+  ggtitle('The histogram of sulfur.dioxide')+
+  xlab('free.sulfur.dioxide(mg/dm^3)')#Adjust the binwidth,x axis.
 
 ggplot(aes(y=free.sulfur.dioxide,x=quality),data = whites_wine)+
-  geom_boxplot()
+  geom_boxplot()+
+  ggtitle('The boxplot of free.sulfur.dioxide in quality')+
+  ylab('free.sulfur.dioxide(mg/dm^3)')
+summary(whites_wine$free.sulfur.dioxide)
 ```
 
   
   
   
-    Most free sulfur dioxide between 25-50mg/dm^3,A few data is larger than 100mg/dm^3
+    The histogram of free.sulfur.dioxide is a normal distribution.Median is 34.00 and mean is 35.31,and have maximum 289.00. Most free sulfur dioxide between 25-50mg/dm^3,A few data is larger than 100mg/dm^3
   
 ```{r echo=FALSE,total.sulfur.dioxide}
 summary(whites_wine$total.sulfur.dioxide)
 ggplot(aes(x=total.sulfur.dioxide),data = whites_wine)+
-  geom_histogram()
+  geom_histogram()# plot the histogram of total.sulfur.dioxide
 
 ggplot(aes(x=total.sulfur.dioxide),data = whites_wine)+
   geom_histogram(binwidth = 1)+
-  scale_x_continuous(breaks = seq(0,300,15),limits = c(0,300))
+  scale_x_continuous(breaks = seq(0,300,15),limits = c(0,300))+
+  ggtitle('The histogram of total.sulfur.dioxide')+
+  xlab('total.sulfur.dioxide(mg/dm^3)')#Adjust group width, x axis, optimize histogram
+summary(whites_wine$total.sulfur.dioxide)
 ```
   
   
   
-    Most total.sulfur.dioxide value between 105mg/dm^3-170mg/dm^3,Max value is 440mg/dm^3
+    It is a normal distribution,media is 134.0,mean is 138.4.It also have some extreme value,min is 9.0,max is 440.Most total.sulfur.dioxide value between 105mg/dm^3-170mg/dm^3.
   
   
 ```{r echo=FALSE,bound.sulfur.dioxide}
-whites_wine<-transform(whites_wine,bound.sulfur.dioxide=total.sulfur.dioxide-free.sulfur.dioxide)
+whites_wine<-transform(whites_wine,bound.sulfur.dioxide=total.sulfur.dioxide-free.sulfur.dioxide)#add a bound.sulfur.dioxide(total-free)
 summary(whites_wine$bound.sulfur.dioxide)
 
 ggplot(aes(x=bound.sulfur.dioxide),data = whites_wine)+
   geom_histogram(binwidth = 3)+
-  scale_x_continuous(breaks = seq(4,200,20),limits = c(0,200))
+  scale_x_continuous(breaks = seq(4,200,20),limits = c(0,200))+
+  ggtitle('The histogram of bound.sulfur.dioxide')+
+  xlab('bound.sulfur.sioxide(mg/dm^3)')
 
 ggplot(aes(x=bound.sulfur.dioxide),data = whites_wine)+
   geom_histogram(binwidth = 3)+
   scale_x_continuous(breaks = seq(4,200,20),limits = c(0,200))+
-  facet_wrap(~quality,scales = 'free_y',ncol = 2)
+  facet_wrap(~quality,scales = 'free_y',ncol = 2)+
+  ggtitle('The histogram of bound.sulfur.dioxide in each quality')+
+  xlab('bound.sulfur.sioxide(mg/dm^3)')
+
 ggplot(data = whites_wine)+
   geom_density(aes(x=bound.sulfur.dioxide),fill='grey50')+
   scale_x_continuous(breaks = seq(4,200,20),limits = c(0,200))+
-  facet_wrap(~quality,scales = 'free_y',ncol = 2)
+  facet_wrap(~quality,scales = 'free_y',ncol = 2)+
+  ggtitle('The density curve of bound.sulfur.dioxide in each quality')+
+  xlab('bound.sulfur.sioxide(mg/dm^3)')
 ```
   
   
@@ -240,34 +244,39 @@ ggplot(data = whites_wine)+
 summary(whites_wine$density)
 ggplot(aes(x=density),data = whites_wine)+
   geom_histogram(binwidth = 0.0002)+
-  scale_x_continuous(limits = c(0.9871,1.003),breaks = seq(0.9871,1.003,0.001))
+  scale_x_continuous(limits = c(0.9871,1.003),breaks = seq(0.9871,1.003,0.001))+
+  ggtitle('The histogram of density')+
+  xlab('density(g/cm^3)')
 ```
   
   
   
-    Most density value between 0.991g/cm^3-0.996g/cm^3,Max value is 1.039g/cm^3
+    It's like a normal distribution.Most density value between 0.991g/cm^3-0.996g/cm^3,Max value is 1.039g/cm^3
   
 ```{r echo=FALSE,pH}
 summary(whites_wine$pH)
 ggplot(aes(x=pH),data = whites_wine)+
   geom_histogram(binwidth = 0.01)+
-  scale_x_continuous(breaks = seq(2.7,3.82,0.1))
+  scale_x_continuous(breaks = seq(2.7,3.82,0.1))+
+  ggtitle('The histogram of pH')
 ```
   
   
-    The histagram of pH is normal distribution
+    The histagram of pH is normal distribution.The median is 3.18,mean 3.188.Max value 3.820
 
 ```{r echo=FALSE,sulphates}
 summary(whites_wine$sulphates)
 ggplot(aes(x=sulphates),data = whites_wine)+
   geom_histogram(binwidth = 0.008)+
-  scale_x_continuous(limits = c(0.2,1.0),breaks = seq(0.2,1.0,0.05))
+  scale_x_continuous(limits = c(0.2,1.0),breaks = seq(0.2,1.0,0.05))+
+  ggtitle('The histogram of sulphates')+
+  xlab('sulphates(g/dm^3)')
 dim(whites_wine)
 ```
   
   
   
-    Most white wine have a sulphates value between 0.4g/dm^3-0.55g/dm^3
+    Most white wine have a sulphates value between 0.4g/dm^3-0.55g/dm^3.
 # Univariate Analysis
 
 ### What is the structure of your dataset?
@@ -307,34 +316,42 @@ dim(whites_wine)
 # Bivariate Plots Section
 ```{r echo=FALSE, Bivariate_Plots}
 summary(whites_wine)
-
 theme_set(theme_minimal(20))
 set.seed(129688)
 names(whites_wine)
-cor(whites_wine[,c(2,3:12)])
-#cor.test(whites_wine$pH,whites_wine$bound.sulfur.dioxide)
-ggpairs(whites_wine[,c(2,3:14)],axisLabels = 'internal')
+whites_wine_cor<-whites_wine[,-12]
+ggcorr(data = whites_wine_cor,hjust=1,size=4,color='grey50',layout.exp=2,label = TRUE, label_size = 3, label_round = 2, label_alpha = TRUE)# check the correlation coefficients between variables.
 ```
 
+
+
+
+    Check the correlation coefficients between variables with ggcorr function.
+    The alcohol degree was negatively correlated with density and the correlation coefficient was 0.78.And residual sugar was positively correlated with density and the correlation coefficient was 0.84.total.sulfur.dioxide was positively correlated with density and the correlation coefficient was 0.53.
+    The fixed.acidity was negatively correlated with pH and the correlation codfficient was 0.43.
+    Next, explore the relationship between the two variables.Like:acidity and pH,alcohol,residual.sugar,total.sulfur.dioxide ,quality and density...
 ```{r echo=FALSE,fixed_acidity_pH}
 ggplot(aes(x=fixed.acidity,y=pH),data = whites_wine)+
-  geom_point()
+  geom_point()# A scatter plot of fixed_acidity and pH.
 
 ggplot(aes(x=fixed.acidity,y=pH),data = whites_wine)+
   geom_jitter(alpha=1/10)+
   xlim(quantile(whites_wine$fixed.acidity,.01),quantile(whites_wine$fixed.acidity,.99))+
-  geom_smooth(method = 'lm')
+  geom_smooth(method = 'lm')+
+  ggtitle('A scatter plot of fixed_acidity and pH')+
+  xlab('fixed_acidity(g/dm^3)')
 ```
 
 
 
-    As fixed acidity increases,the pH value decrease.The relationship between fixed acidity appears to be linear.
+    Acid is negatively correlated with pH,as fixed acidity increases,the pH value decrease.The relationship between fixed acidity appears to be linear.Next,check the relationship between other acids and pH.
     
 ```{r echo=FALSE,volatile_acidity_pH}
 ggplot(aes(x=volatile.acidity,y=pH),data =whites_wine)+
   geom_jitter(alpha=1/10)+
   xlim(quantile(whites_wine$volatile.acidity,.01),quantile(whites_wine$volatile.acidity,.99))+
-  geom_smooth()
+  geom_smooth()+
+  ggtitle('the scatterplot of volatile_acidity and pH')
 cor.test(whites_wine$volatile.acidity,whites_wine$pH)
 ```
   
@@ -347,21 +364,24 @@ cor.test(whites_wine$volatile.acidity,whites_wine$pH)
 ggplot(aes(x=citric.acid,y=pH),data =whites_wine)+
   geom_jitter(alpha=1/10)+
   xlim(quantile(whites_wine$citric.acid,.01),quantile(whites_wine$citric.acid,.99))+
-  geom_smooth()
+  geom_smooth()+
+  ggtitle('The scatter plot of citric.acid and pH')
 cor.test(whites_wine$citric.acid,whites_wine$pH)
 ```
 
 
 
 
-    It still smoothes trend,between citric acidity and pH.But there is a similar trend between citric acid, nonvolatile acid and pH. I'm going to explore the relationship between all the acids and the ph.
+    It still smoothes trend,between citric acidity and pH.But there is a similar trend between citric acid, non-volatile acid and pH. I'm going to explore the relationship between all the acids and the ph.
   
   
 ```{r echo=FALSE,total.acidity-pH}
 ggplot(aes(x=total_acidity,y=pH),data =whites_wine)+
   geom_jitter(alpha=1/10)+
   xlim(quantile(whites_wine$total_acidity,.01),quantile(whites_wine$total_acidity,.99))+
-  geom_smooth()
+  geom_smooth()+
+  ggtitle('The scatter plot of total.acidity and pH')+
+  xlab('total_acidity(g/dm^3)')
 cor.test(whites_wine$total_acidity,whites_wine$pH)
 ```
   
@@ -373,11 +393,14 @@ cor.test(whites_wine$total_acidity,whites_wine$pH)
   
 ```{r echo=FALSE,sulphates-pH}
 ggplot(aes(x=sulphates,y=pH),data = whites_wine)+
-  geom_jitter()
+  geom_jitter()+
+  ggtitle('The scatter plot of sulphates and pH')
 ggplot(aes(x=sulphates,y=pH),data = whites_wine)+
   geom_jitter(alpha=1/10)+
   xlim(quantile(whites_wine$sulphates,.02),quantile(whites_wine$sulphates,.95))+
-  geom_smooth()
+  geom_smooth()+
+  ggtitle('The scatter plot of sulphates and pH')+
+  xlab('sulphates(g/dm^3)')
 cor.test(whites_wine$sulphates,whites_wine$pH)
 
 ```
@@ -390,12 +413,15 @@ cor.test(whites_wine$sulphates,whites_wine$pH)
 ```{r echo=FALSE,alcohol-pH}
 cor.test(whites_wine$alcohol,whites_wine$pH)
 ggplot(aes(x=alcohol,y=pH),data = whites_wine)+
-  geom_point()
+  geom_point()+
+  ggtitle('The scatter plot of alcohol and pH')
 
 ggplot(aes(x=alcohol,y=pH),data = whites_wine)+
   geom_jitter(alpha=1/4)+
   xlim(quantile(whites_wine$alcohol,.01),quantile(whites_wine$alcohol,.99))+
-  geom_line(stat = 'summary',fun.y=mean,color='red')
+  geom_line(stat = 'summary',fun.y=mean,color='red')+
+  ggtitle('The scatter plot of alcohol and pH')+
+  xlab('alcohol(% by volume)')
 ```
 
 
@@ -403,17 +429,21 @@ ggplot(aes(x=alcohol,y=pH),data = whites_wine)+
 ```{r echo=FALSE,residual.sugar-pH } 
 cor.test(whites_wine$residual.sugar,whites_wine$pH)
 ggplot(aes(x=residual.sugar,y=pH),data = whites_wine)+
-  geom_point()
+  geom_point()+
+  ggtitle('The scatter plot of residual.sugar and pH')
 
 ggplot(aes(x=residual.sugar,y=pH),data = whites_wine)+
   geom_point(alpha=1/4)+
-  xlim(0,quantile(whites_wine$residual.sugar,.99))
+  xlim(0,quantile(whites_wine$residual.sugar,.99))+
+  ggtitle('The scatter plot of residual.sugar and pH')
 summary(whites_wine$residual.sugar)
 
 ggplot(aes(x=residual.sugar,y=pH),data = whites_wine)+
   geom_point(alpha=1/4)+
   xlim(5,quantile(whites_wine$residual.sugar,.99))+
-  geom_smooth(method = 'lm')
+  geom_smooth(method = 'lm')+
+  ggtitle('The scatter plot of residual.sugar and pH')+
+  xlab('residual.sugar(g/dm^3)')# adjust x axis
 ```
   
     When the residual sugar less than 5 g/dm^3,pH value  is more uncertainty.As residual sugar over about 5g/dm^3,pH value decrease slowly.
@@ -423,7 +453,8 @@ ggplot(aes(x=residual.sugar,y=pH),data = whites_wine)+
 ```{r echo=FALSE,pH-quality}
 ggplot(aes(y=pH,x=quality),data = whites_wine)+
   geom_boxplot()+
-  scale_y_continuous(breaks = seq(0,4,0.1))
+  scale_y_continuous(breaks = seq(0,4,0.1))+
+  ggtitle('The box plot of pH and quality')
 
 ```
 
@@ -435,7 +466,9 @@ ggplot(aes(y=pH,x=quality),data = whites_wine)+
 
 ```{r echo=FALSE,sulphates-quality}
 ggplot(aes(x=quality,y=sulphates),data = whites_wine)+
-  geom_boxplot()
+  geom_boxplot()+
+  ggtitle('The box plot of sulphates and quality')+
+  ylab('sulphates(g/dm^3)')
 
 ```
 
@@ -444,12 +477,49 @@ ggplot(aes(x=quality,y=sulphates),data = whites_wine)+
 
     White wines with high quality scores also have high median sulfate.
 
+```{r echo=FALSE,residual.sugar-density}
+ggplot(aes(x=residual.sugar,y=density),data = subset(whites_wine,density<=1.01))+
+  geom_point(alpha=1/4,position = position_jitter())+
+  ggtitle('The scatter plot of residual.sugar and density')+
+  xlab('residual.sugar(g/dm^3)')+
+  ylab('density(g/cm^3)')
+
+ggplot(aes(x=residual.sugar,y=density),data = subset(whites_wine,density<=1.01))+
+  xlim(0,quantile(whites_wine$residual.sugar,.99))+
+  geom_point(alpha=1/4,position = position_jitter())+
+  geom_smooth()+
+  ggtitle('The scatter plot of residual.sugar and density')+
+  xlab('residual.sugar(g/dm^3)')+
+  ylab('density(g/cm^3)')# Adjust the x axis
+```
+
+
+
+    With the increase of residual sugar content, white wine density obviously increased.
+  
+```{r echo=FALSE,alcohol-density}
+ggplot(aes(x=alcohol,y=density),data = subset(whites_wine,density<=1.01))+
+  geom_point(alpha=1/4,position = position_jitter())+
+  geom_smooth()+
+  ggtitle('The scatter of alcohol and density')+
+  xlab('alcohol(% by volume)')+
+  ylab('density(g/cm^3)')
+  
+```
+    
+    
+    
+    As alcohol increase,the value of density decrease.  
+
 ```{r echo=FALSE,residual.sugar-quality}
 ggplot(aes(x=quality,y=residual.sugar),data = whites_wine)+
-  geom_boxplot()
+  geom_boxplot()+
+  ggtitle('The box plot of residual.sugar and quality')
 ggplot(aes(x=quality,y=residual.sugar),data = whites_wine)+
   geom_boxplot()+
-  ylim(0,quantile(whites_wine$residual.sugar,0.99))
+  ylim(0,quantile(whites_wine$residual.sugar,0.99))+
+  ggtitle('The box plot of residual.sugar and quality')+
+  ylab('residual.sugar(g/dm^3)')#Adjust y  axis
 ```
 
 
@@ -460,20 +530,19 @@ ggplot(aes(x=quality,y=residual.sugar),data = whites_wine)+
 
 ```{r echo=FALSE,alcohol-quality}
 ggplot(aes(x=quality,y=alcohol),data = whites_wine)+
-  geom_boxplot()
+  geom_boxplot()+
+  ggtitle('The box plot of alcohol and quality')+
+  ylab('alcohol(% by volume)')
 
 ```
-
-
-
-
-    
-    White wine with a high quality score has a higher median alcohol content.
   
   
+  White wine with a high quality score has a higher median alcohol content.
 ```{r echo=FALSE,desity-quality}
 ggplot(aes(x=quality,y=density),data = subset(whites_wine,density<=1))+
-  geom_boxplot()
+  geom_boxplot()+
+  ggtitle('The box plot of density and quality')+
+  ylab('density(c/dm^3)')
 
 
 ```
@@ -482,30 +551,7 @@ ggplot(aes(x=quality,y=density),data = subset(whites_wine,density<=1))+
     
     White wine with a high quality score is relatively low in density.
   
-```{r echo=FALSE,residual.sugar-density}
-ggplot(aes(x=residual.sugar,y=density),data = subset(whites_wine,density<=1.01))+
-  geom_point(alpha=1/4,position = position_jitter())
 
-ggplot(aes(x=residual.sugar,y=density),data = subset(whites_wine,density<=1.01))+
-  xlim(0,quantile(whites_wine$residual.sugar,.99))+
-  geom_point(alpha=1/4,position = position_jitter())+
-  geom_smooth()
-```
-
-
-
-    With the increase of residual sugar content, white wine density obviously increased.
-  
-```{r echo=FALSE,alcohol-density}
-ggplot(aes(x=alcohol,y=density),data = subset(whites_wine,density<=1.01))+
-  geom_point(alpha=1/4,position = position_jitter())+
-  geom_smooth()
-  
-```
-    
-    
-    
-    As alcohol increase,the value of density decrease.
 # Bivariate Analysis
 
 ### Talk about some of the relationships you observed in this part of the investigation. How did the feature(s) of interest vary with other features in the dataset?
@@ -530,7 +576,10 @@ ggplot(aes(x=alcohol,y=density),data = subset(whites_wine,density<=1.01))+
 ```{r echo=FALSE, Multivariate_Plots}
 ggplot(aes(x=alcohol,y=density),data = subset(whites_wine,density<=1.01))+
   geom_jitter(aes(color=quality))+
-  scale_color_brewer(type = 'div',guide =guide_legend(title = 'quality', reverse = T,override.aes = list(alpha = 1, size = 3)))
+  scale_color_brewer(guide =guide_legend(title = 'quality', reverse = T,override.aes = list(alpha = 1, size = 3)))+
+  ggtitle('The scatter plot of alcohol and density ')+
+  xlab('alcohol(% by volume)')+
+  ylab('density(g/cm^3)')
 ```
 
 
@@ -541,7 +590,10 @@ ggplot(aes(x=alcohol,y=density),data = subset(whites_wine,density<=1.01))+
 ```{r echo=FALSE,residual_sugar_density_quality}
 ggplot(aes(x=residual.sugar,y=density),data = subset(whites_wine,density<=1.01))+
   geom_jitter(aes(color=quality))+
-  scale_color_brewer(type = 'div',guide =guide_legend(title = 'quality', reverse = T,override.aes = list(alpha = 1, size = 3)))
+  scale_color_brewer(guide =guide_legend(title = 'quality', reverse = T,override.aes = list(alpha = 1, size = 3)))+
+  ggtitle('The scatter plot of residual.sugar and density')+
+  xlab('residual.sugar(g/dm^3)')+
+  ylab('density(g/cm^3)')
 
 ```
 
@@ -560,7 +612,9 @@ ggplot(aes(x=fixed.acidity,y=pH),data = whites_wine)+
 ggplot(aes(x=fixed.acidity,y=pH),data = whites_wine)+
   xlim(quantile(whites_wine$fixed.acidity,.01),quantile(whites_wine$fixed.acidity,.99))+
   geom_jitter(alpha=1/2,aes(color=quality))+
-  scale_color_brewer(type = 'div',palette = 'RdBu')
+  scale_color_brewer(type='seq',guide =guide_legend(title = 'quality', reverse = T,override.aes = list(alpha = 1, size = 3)))+
+  ggtitle('fixed.acidity vs pH')+
+  xlab('fixed.acidity(g/dm^3)')
 ```
 
 
@@ -576,7 +630,8 @@ ggplot(aes(x=fixed.acidity,y=pH),data = whites_wine)+
 ggplot(aes(x=total_acidity,y=pH),data = whites_wine)+
   xlim(quantile(whites_wine$total_acidity,.01),quantile(whites_wine$total_acidity,.99))+
   geom_jitter(alpha=1/2,aes(color=quality))+
-  scale_color_brewer(type = 'div',palette = 'RdBu')
+  scale_color_brewer(type='seq')+
+  xlab('total.acidity(g/dm^3)')
 ```
     
     
@@ -586,7 +641,9 @@ ggplot(aes(x=total_acidity,y=pH),data = whites_wine)+
 ```{r echo=FALSE}
 ggplot(aes(y=pH,x=density),data = subset(whites_wine,density<=1.01))+
   geom_point(aes(color=quality))+
-  scale_color_brewer(type = 'div')
+  scale_color_brewer()+
+  ggtitle('density vs pH')+
+  xlab('g/cm^3')
 ```
 
 
@@ -614,7 +671,7 @@ ggplot(aes(x=total_acidity,y=pH),data =whites_wine)+
   geom_jitter(alpha=1/2,aes(color=quality))+
   xlim(quantile(whites_wine$total_acidity,.01),quantile(whites_wine$total_acidity,.99))+
   xlab('total_acidity(g/dm^3)')+
-  scale_color_brewer(type = 'div')+
+  scale_color_brewer()+
   ggtitle('Total acidity vs pH')
 ```
 
@@ -639,7 +696,7 @@ ggplot(aes(x=quality,y=alcohol),data = whites_wine)+
 ```{r echo=FALSE, Plot_Three}
 ggplot(aes(x=alcohol,y=density),data = subset(whites_wine,density<=1.01))+
   geom_jitter(aes(color=quality))+
-  scale_color_brewer(type = 'div',guide =guide_legend(title = 'quality', reverse = T,override.aes = list(alpha = 1, size = 3)))+
+  scale_color_brewer(guide =guide_legend(title = 'quality', reverse = T,override.aes = list(alpha = 1, size = 3)))+
   ggtitle('The relation of alcohol-density and quality')+
   xlab('alcohol(% by volume)')+
   ylab('density(g/cm^3)')
@@ -652,3 +709,4 @@ ggplot(aes(x=alcohol,y=density),data = subset(whites_wine,density<=1.01))+
 
 # Reflection
     The relationship between the pH value of white wine, the alcohol degree and the residual sugar was just beginning to be explored.Because these are the characteristics that we pay attention to when we taste wine.Only the histogram, box graph and scatter diagram are used to explore, and some representational relationships are found roughly.The quality score is set as an ordered factor.The factors that affect the pH value are also explored, and it is found that acidic substances are the main causes of pH, but other relevant factors have not been found.The exploration of alcohol and residual sugar found that they were related to the density of fish wine, so I went to explore the relationship between density and quality.The quality of the wine is related to the pH and density, but I can't find the balance between the pH and the density to make the wine better.As for this data exploration, I think it is necessary to have a clear idea, and according to the actual situation, such as the characteristics of wine in reality, we should not blindly explore it.But at the same time, you can't explore it with a conclusion.
+    Through this data exploration, the future analysis work should have a clear understanding of the data and optimize the analytical thinking;Learn to process data, include data groups, and remodel to better discover data patterns.
