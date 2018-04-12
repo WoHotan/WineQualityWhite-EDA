@@ -19,6 +19,7 @@ install.packages("dplyr", dependencies = T)
 ```
 
 ## 项目文件
-- RMD 文件，包含分析报告（最终图形和摘要以及反思）
-- 使用 knitr 包从 RMD 文件拼合而来的 HTML 文件
-- 原始数据集和数据源-
+- RMD 文件[project.Rmd](https://github.com/WoHotan/WineQualityWhite-EDA/blob/master/WineQuality-EDA/project.Rmd)，包含分析报告（最终图形和摘要以及反思）
+- 使用 knitr 包从 RMD 文件拼合而来的 HTML 文件 [project.html](https://github.com/WoHotan/WineQualityWhite-EDA/blob/master/WineQuality-EDA/project.html)
+- 原始数据集和数据源-[wineQualityWhites.csv](https://github.com/WoHotan/WineQualityWhite-EDA/blob/master/wineQualityWhites.csv).
+
