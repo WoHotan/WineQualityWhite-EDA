@@ -1,7 +1,4 @@
 # WineQualityWhite-EDA
-Using R and using exploratory data analysis to explore the white wine dataset.
-
-
 
 If you want to check the project result,open the [project.html](https://github.com/WoHotan/WineQualityWhite-EDA/blob/master/WineQuality-EDA/project.html) directly
 
